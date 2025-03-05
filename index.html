@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Żużel</title>
+    <link rel="stylesheet" href="./public/style.css">
+    <script src="game.js" type="module"></script>
+
+</head>
+
+<body>
+    <div id="start-screen">
+        <h1>Żużel</h1>
+        <div>
+            <label>
+                <input type="radio" name="mode" value="singleplayer" checked> Singleplayer
+            </label>
+            <label>
+                <input type="radio" name="mode" value="multiplayer"> Multiplayer
+            </label>
+        </div>
+        <div id="multiplayer-options" style="display: none;">
+            <label for="num-players">Liczba graczy:</label>
+            <select id="num-players">
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+            </select>
+        </div>
+        <button id="start-button">Start</button>
+    </div>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <div id="alert" class="alert"></div>
+</body>
+
+</html>
