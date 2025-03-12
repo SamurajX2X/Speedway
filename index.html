@@ -4,35 +4,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Żużel</title>
-    <link rel="stylesheet" href="./public/style.css">
-    <script src="game.js" type="module"></script>
+    <title>Gra Żużlowa</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
 
+        canvas {
+            background-color: green;
+            display: none;
+            border: 5px solid white;
+        }
+
+        #start-screen {
+            margin-top: 0;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #ff5722;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #e64a19;
+        }
+    </style>
 </head>
 
 <body>
     <div id="start-screen">
-        <h1>Żużel</h1>
-        <div>
-            <label>
-                <input type="radio" name="mode" value="singleplayer" checked> Singleplayer
-            </label>
-            <label>
-                <input type="radio" name="mode" value="multiplayer"> Multiplayer
-            </label>
-        </div>
-        <div id="multiplayer-options" style="display: none;">
-            <label for="num-players">Liczba graczy:</label>
-            <select id="num-players">
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-            </select>
-        </div>
+        <h1>Gra Żużlowa</h1>
         <button id="start-button">Start</button>
     </div>
-    <canvas id="canvas" width="800" height="600"></canvas>
-    <div id="alert" class="alert"></div>
+    <canvas id="gameCanvas" width="1200" height="800"></canvas>
+
+    <script src="game.js"></script>
 </body>
 
 </html>

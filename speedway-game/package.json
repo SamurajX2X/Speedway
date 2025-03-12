@@ -1,0 +1,23 @@
+{
+  "name": "speedway-game",
+  "version": "1.0.0",
+  "description": "A speedway racing game built with JavaScript.",
+  "main": "src/js/game.js",
+  "scripts": {
+    "start": "live-server src",
+    "test": "jest"
+  },
+  "keywords": [
+    "speedway",
+    "game",
+    "javascript"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "jest": "^27.0.0"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
