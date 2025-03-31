@@ -1,3 +1,5 @@
+import { Motorcycle } from './motorcycle.js';
+
 export class Board {
     constructor(width, height) {
         this.canvas = document.getElementById("track") || document.createElement('canvas');
@@ -21,8 +23,20 @@ export class Board {
 
         // Tekstury
         this.grassPattern = null;
+
         this.dirtPattern = null;
         this.loadTextures();
+
+        this.motorcycle = {
+            x: this.xStartBig + this.lengthBig / 2,
+            y: this.yTopBig + this.widthBig / 2,
+            width: 50,
+            height: 30,
+            angle: 0,
+            speed: 0,
+            image: null
+        };
+        this.loadMotorcycleImage();
     }
 
     loadTextures() {
@@ -43,11 +57,21 @@ export class Board {
         dirtImg.src = 'public/gfx/dirt.jpg';
     }
 
+    loadMotorcycleImage() {
+        const motorcycleImg = new Image();
+        motorcycleImg.onload = () => {
+            this.motorcycle.image = motorcycleImg;
+            this.update();
+        };
+        motorcycleImg.src = 'public/gfx/motorcycle.png';
+    }
+
     initialize() {
         if (!document.getElementById("track")) {
             document.body.appendChild(this.canvas);
         }
         this.drawTracks();
+        this.drawMotorcycle();
     }
 
     drawTracks() {
@@ -103,9 +127,49 @@ export class Board {
         this.context.restore();
     }
 
+    drawMotorcycle() {
+        if (this.motorcycle.image) {
+            this.context.save();
+            this.context.translate(this.motorcycle.x, this.motorcycle.y);
+            this.context.rotate(this.motorcycle.angle);
+            this.context.drawImage(
+                this.motorcycle.image,
+                -this.motorcycle.width / 2,
+                -this.motorcycle.height / 2,
+                this.motorcycle.width,
+                this.motorcycle.height
+            );
+            this.context.restore();
+        }
+    }
+
+    updateMotorcyclePosition(key) {
+        const speedIncrement = 2;
+        const angleIncrement = 0.1;
+
+        if (key === "ArrowUp") {
+            this.motorcycle.speed += speedIncrement;
+        } else if (key === "ArrowDown") {
+            this.motorcycle.speed -= speedIncrement;
+        } else if (key === "ArrowLeft") {
+            this.motorcycle.angle -= angleIncrement;
+        } else if (key === "ArrowRight") {
+            this.motorcycle.angle += angleIncrement;
+        }
+
+        this.motorcycle.x += this.motorcycle.speed * Math.cos(this.motorcycle.angle);
+        this.motorcycle.y += this.motorcycle.speed * Math.sin(this.motorcycle.angle);
+
+        // Prevent motorcycle from leaving the track
+        if (!this.isInsideTrack(this.motorcycle.x, this.motorcycle.y)) {
+            this.motorcycle.speed = 0; // Stop the motorcycle if it leaves the track
+        }
+    }
+
     update() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawTracks();
+        this.drawMotorcycle();
     }
 
     isInsideTrack(x, y) {
@@ -170,4 +234,9 @@ export class Board {
 document.addEventListener("DOMContentLoaded", () => {
     const board = new Board(1200, 800);
     board.initialize();
+
+    document.addEventListener("keydown", (event) => {
+        board.updateMotorcyclePosition(event.key);
+        board.update();
+    });
 });
