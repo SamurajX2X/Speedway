@@ -1,90 +1,65 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const startButton = document.getElementById('start-button');
-const startScreen = document.getElementById('start-screen');
+import { Board } from './board.js';
+import { Player } from './player.js';
 
-startButton.addEventListener('click', () => {
-    startScreen.style.display = 'none';
-    canvas.style.display = 'block';
-    drawTrack();
-});
+// Elementy DOM
+// const startScreen = document.getElementById("start-screen");
+// const startButton = document.getElementById("start-button");
 
-function drawTrack() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+// Zmienne globalne
+let board;
+let player;
+let keys = {};
+let gameRunning = false;
 
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const straightLength = 600; // Długość prostych
-    const outerRadius = 200; // Większy promień zewnętrzny
-    const trackWidth = 100; // Znacznie szerszy tor
-    const innerRadius = outerRadius - trackWidth;
+function startGame() {
+    // startScreen.style.display = "none";
+    board = new Board(1200, 800);
+    board.initialize();
+    player = new Player();
+    gameRunning = true;
+    requestAnimationFrame(gameLoop);
+}
 
-    // Wypełnienie toru (brązowy)
-    ctx.fillStyle = '#654321';
-    ctx.beginPath();
+function endGame() {
+    gameRunning = false;
+    board.canvas.style.display = "none";
+    // startScreen.style.display = "block";
+    player.reset();
+}
 
-    // Zewnętrzny kontur (zegarowo)
-    ctx.moveTo(centerX - straightLength / 2, centerY - outerRadius);
-    ctx.lineTo(centerX + straightLength / 2, centerY - outerRadius);
-    ctx.arc(centerX + straightLength / 2, centerY, outerRadius, -Math.PI / 2, Math.PI / 2);
-    ctx.lineTo(centerX - straightLength / 2, centerY + outerRadius);
-    ctx.arc(centerX - straightLength / 2, centerY, outerRadius, Math.PI / 2, 3 * Math.PI / 2);
+function gameLoop() {
+    if (!gameRunning) return;
 
-    // Wewnętrzny kontur (przeciwnie do zegara)
-    ctx.moveTo(centerX - straightLength / 2 + trackWidth, centerY - innerRadius);
-    ctx.lineTo(centerX + straightLength / 2 - trackWidth, centerY - innerRadius);
-    ctx.arc(centerX + straightLength / 2 - trackWidth, centerY, innerRadius, -Math.PI / 2, Math.PI / 2, true);
-    ctx.lineTo(centerX - straightLength / 2 + trackWidth, centerY + innerRadius);
-    ctx.arc(centerX - straightLength / 2 + trackWidth, centerY, innerRadius, Math.PI / 2, 3 * Math.PI / 2, true);
+    // Odświeżenie planszy
+    board.update();
 
-    ctx.fill('evenodd');
+    // Aktualizacja i rysowanie gracza
+    player.update(keys);
+    player.draw(board.context);
 
-    // Bariery zewnętrzne
-    ctx.strokeStyle = 'white';
-    ctx.lineWidth = 10;
-    ctx.beginPath();
-    ctx.moveTo(centerX - straightLength / 2, centerY - outerRadius);
-    ctx.lineTo(centerX + straightLength / 2, centerY - outerRadius);
-    ctx.arc(centerX + straightLength / 2, centerY, outerRadius, -Math.PI / 2, Math.PI / 2);
-    ctx.lineTo(centerX - straightLength / 2, centerY + outerRadius);
-    ctx.arc(centerX - straightLength / 2, centerY, outerRadius, Math.PI / 2, 3 * Math.PI / 2);
-    ctx.closePath();
-    ctx.stroke();
+    // Sprawdzanie kolizji z granicami toru
+    if (!board.isInsideTrack(player.x, player.y)) {
+        console.log("poza sigmom");
 
-    // Bariery wewnętrzne
-    ctx.beginPath();
-    ctx.moveTo(centerX - straightLength / 2 + trackWidth, centerY - innerRadius);
-    ctx.lineTo(centerX + straightLength / 2 - trackWidth, centerY - innerRadius);
-    ctx.arc(centerX + straightLength / 2 - trackWidth, centerY, innerRadius, -Math.PI / 2, Math.PI / 2);
-    ctx.lineTo(centerX - straightLength / 2 + trackWidth, centerY + innerRadius);
-    ctx.arc(centerX - straightLength / 2 + trackWidth, centerY, innerRadius, Math.PI / 2, 3 * Math.PI / 2);
-    ctx.closePath();
-    ctx.stroke();
-
-    // Linia startowa
-    ctx.strokeStyle = 'white';
-    ctx.setLineDash([20, 15]);
-    ctx.lineWidth = 5;
-    ctx.beginPath();
-    ctx.moveTo(centerX - straightLength / 2 + 50, centerY - outerRadius + trackWidth / 2);
-    ctx.lineTo(centerX + straightLength / 2 - 50, centerY - outerRadius + trackWidth / 2);
-    ctx.stroke();
-
-    // Kratki startowe
-    const gridCount = 4;
-    const gridSpacing = straightLength / (gridCount + 1);
-    ctx.setLineDash([]);
-    for (let i = 1; i <= gridCount; i++) {
-        const x = centerX - straightLength / 2 + gridSpacing * i;
-        ctx.fillStyle = 'white';
-        ctx.fillRect(x - 3, centerY - outerRadius + trackWidth / 2 - 15, 6, 30);
+        // endGame();
+        return;
     }
 
-    // Bandy bezpieczeństwa
-    ctx.strokeStyle = '#666';
-    ctx.lineWidth = 20;
-    ctx.beginPath();
-    ctx.arc(centerX + straightLength / 2, centerY, outerRadius + 20, -Math.PI / 2, Math.PI / 2);
-    ctx.arc(centerX - straightLength / 2, centerY, outerRadius + 20, Math.PI / 2, 3 * Math.PI / 2);
-    ctx.stroke();
+    requestAnimationFrame(gameLoop);
 }
+
+// Obsługa wydarzeń
+document.addEventListener("DOMContentLoaded", () => {
+    startGame();
+});
+
+document.addEventListener("keydown", (e) => {
+    keys[e.code] = true;
+});
+
+document.addEventListener("keyup", (e) => {
+    keys[e.code] = false;
+});
+
+// Opcjonalne: włącz przycisk start
+// startButton.addEventListener("click", startGame);

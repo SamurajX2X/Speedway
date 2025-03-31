@@ -1,35 +1,38 @@
-\  body {
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    background-color: white;
+    color: white;
     margin: 0;
-    padding: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f0f0f0;
+    /* overflow: hidden; */
+}
+
+canvas {
+    /* background-color: green; */
+    /* background-image: url('gfx/grass.jpg'); */
+    /* display: none; */
+    border: 5px solid white;
 }
 
 #start-screen {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    text-align: center;
+    margin-top: 0;
 }
 
-#canvas {
-    border: 1px solid black;
-    background-color: #fff;
-    display: none;
-}
-
-.alert {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
+button {
+    font-size: 20px;
     padding: 10px 20px;
+    cursor: pointer;
+    background-color: #ff5722;
+    color: white;
+    border: none;
     border-radius: 5px;
-    display: none;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #e64a19;
 }
