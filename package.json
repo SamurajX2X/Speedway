@@ -1,0 +1,14 @@
+{
+    "name": "speedway",
+    "version": "1.0.0",
+    "description": "Projekt szkolny Mendela",
+    "main": "src/index.js",
+    "scripts": {
+        "start": "live-server"
+    },
+    "author": "Mateusz",
+    "license": "ISC",
+    "devDependencies": {
+        "live-server": "^1.2.2"
+    }
+}

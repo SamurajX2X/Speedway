@@ -22,26 +22,28 @@ function startGame() {
 
 function endGame() {
     gameRunning = false;
-    board.canvas.style.display = "none";
-    // startScreen.style.display = "block";
-    player.reset();
+    console.log("Game Over - Collision!");
+
+    // Optional: Add a delay before reset
+    setTimeout(() => {
+        player.reset();
+        startGame();
+    }, 2000);
 }
 
 function gameLoop() {
     if (!gameRunning) return;
 
-    // Odświeżenie planszy
+    // Refresh board
     board.update();
 
-    // Aktualizacja i rysowanie gracza
-    player.update(keys);
+    // Update and draw player with board reference
+    player.update(keys, board);
     player.draw(board.context);
 
-    // Sprawdzanie kolizji z granicami toru
-    if (!board.isInsideTrack(player.x, player.y)) {
-        console.log("poza sigmom");
-
-        // endGame();
+    // Check for collision and end game if player collides
+    if (player.isColliding) {
+        endGame();
         return;
     }
 
