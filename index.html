@@ -29,7 +29,7 @@
             <button type="submit">Graj</button>
         </form>
 
-        <div id="controlsInfo">
+        <!-- <div id="controlsInfo">
             <h3>Sterowanie:</h3>
             <div class="player-controls">
                 <p><strong>Gracz 1:</strong> Strzałka lewo/prawo</p>
@@ -38,19 +38,29 @@
                 <p><strong>Gracz 4:</strong> K/L</p>
             </div>
         </div>
-    </div>
+    </div> -->
 
-    <div id="gameArea" style="display: none;">
+        <div id="key-bindings">
+            <h3>Sterowanie:</h3>
+            <div class="key-binding-container">
+                <button class="key-binding" data-player="1">Player 1: ArrowRight</button>
+                <button class="key-binding" data-player="2">Player 2: KeyD</button>
+                <button class="key-binding" data-player="3">Player 3: KeyL</button>
+                <button class="key-binding" data-player="4">Player 4: KeyN</button>
+            </div>
+        </div>
 
-        <canvas id="track" width="1200" height="800"></canvas>
-    </div>
+        <div id="gameArea" style="display: none;">
 
-    <div id="gameOver" style="display: none;">
-        <h2>Game Over</h2>
-        <p id="winnerText"></p>
-        <button onclick="location.reload()">Play Again</button>
-    </div>
-    <script type="module" src="src/game.js"></script>
+            <canvas id="track" width="1200" height="800"></canvas>
+        </div>
+
+        <div id="gameOver" style="display: none;">
+            <h2>Game Over</h2>
+            <p id="winnerText"></p>
+            <button onclick="location.reload()">Play Again</button>
+        </div>
+        <script type="module" src="src/game.js"></script>
 </body>
 
 </html>

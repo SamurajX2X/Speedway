@@ -69,10 +69,14 @@ export const gameConfig = {
 // ustawienia menu
 export const formConfig = {
     playerControls: {
-        player1: { left: 'ArrowLeft', right: 'ArrowRight' },
-        player2: { left: 'KeyA', right: 'KeyS' },
-        player3: { left: 'KeyG', right: 'KeyH' },
-        player4: { left: 'KeyK', right: 'KeyL' }
+        // player1: { left: 'ArrowLeft', right: 'ArrowRight' },
+        // player2: { left: 'KeyA', right: 'KeyS' },
+        // player3: { left: 'KeyG', right: 'KeyH' },
+        // player4: { left: 'KeyK', right: 'KeyL' }
+        player1: { right: 'ArrowRight' },
+        player2: { right: 'KeyS' },
+        player3: { right: 'KeyH' },
+        player4: { right: 'KeyL' }
     },
     defaultLaps: 3,
     defaultPlayers: 1

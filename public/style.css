@@ -175,3 +175,25 @@ button:hover {
     color: #ffffff;
     font-size: 0.9em;
 }
+
+/* Key Binding Styles */
+.key-binding-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 20px 0;
+}
+
+.key-binding {
+    background: rgba(255, 87, 34, 0.2);
+    border: 2px solid #ff5722;
+    color: white;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.key-binding:hover {
+    background: rgba(255, 87, 34, 0.4);
+}

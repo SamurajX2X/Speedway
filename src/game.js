@@ -1,15 +1,45 @@
-// tu sie zaczyna cała zabawa
 import { Board } from './board.js'
 import { Player } from './player.js'
 import { gameConfig, formConfig } from './config.js'
+// bidowanie hotkeyow
+function initKeyBindings() {
+    const keyButtons = document.querySelectorAll('.key-binding')
 
-// potrzebne zmienne do działania gry
+    keyButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const playerId = this.dataset.player
+            const originalText = this.textContent
+
+            // zmiana na nacisnij gdy nasluchuje
+            this.textContent = 'Nacsinij klawisz...'
+
+            const keyHandler = (e) => {
+                e.preventDefault()
+
+                // Update 
+                formConfig.playerControls[`player${playerId}`].right = e.code
+
+                // Update textu buttona
+                this.textContent = `Player ${playerId}: ${e.code}`
+
+                // usuwanie listenera
+                document.removeEventListener('keydown', keyHandler)
+            }
+
+            document.addEventListener('keydown', keyHandler)
+        })
+    })
+}
+
+//  zmienne do działania gry
 let board
 let players = []
 let keys = {}
 let gameRunning = false
 let currentLaps = gameConfig.laps
 let currentPlayers = gameConfig.players
+
+
 
 // jak gracz wciska klawisze to tu
 function handleControls(keys) {
@@ -20,7 +50,7 @@ function handleControls(keys) {
     players.forEach(player => {
         if (player.isAlive) {
             const controls = formConfig.playerControls[`player${player.playerId}`]
-            player.handleInput(keys[controls.left], keys[controls.right])
+            player.handleInput(keys[controls.right])
         }
     })
 }
@@ -30,7 +60,12 @@ function startGame(laps, numberOfPlayers) {
     currentLaps = laps
     currentPlayers = numberOfPlayers
 
+    // Create new board and add canvas to gameArea
     board = new Board(1200, 800)
+    const gameArea = document.getElementById("gameArea")
+    gameArea.innerHTML = '' // Clear previous content
+    gameArea.appendChild(board.canvas) // Add canvas to gameArea
+
     board.initialize()
 
     // czyszczenie starych graczy
@@ -44,7 +79,7 @@ function startGame(laps, numberOfPlayers) {
     }
 
     gameRunning = true
-    console.log(`Start gry${currentLaps} laps  ${currentPlayers} players`)
+    console.log(`Start gry: ${currentLaps} laps, ${currentPlayers} players`)
     requestAnimationFrame(gameLoop)
 }
 
@@ -127,12 +162,14 @@ function gameLoop() {
 
     requestAnimationFrame(gameLoop)
 }
-
-// jak strona będzie gotowa
+// dodanie buttonow do DOMa
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("settingsForm")
     const gameArea = document.getElementById("gameArea")
     const settingsPanel = document.getElementById("gameSettings")
+
+    // init bindowania
+    initKeyBindings()
 
     // ustawiamy domyślne wartości
     document.getElementById("laps").value = 3  // standardowa liczba okrążeń
@@ -149,7 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
         laps = Math.min(Math.max(laps, 1), 10)  // min 1 max 10
         players = Math.min(Math.max(players, 1), 4)  // min 1 max 4
 
-        // pokazujemy arenę gry i chowamy formularz
+        // show areny i usuwanie tego no forma
         settingsPanel.style.display = "none"
         gameArea.style.display = "block"
 

@@ -100,8 +100,8 @@ export class Player {
     }
 
     // reakcja na klawisze
-    handleInput(leftKey, rightKey) {
-        if (leftKey) this.angle -= this.turnSpeed;
+    handleInput(rightKey) {
+        // if (leftKey) this.angle -= this.turnSpeed;
         if (rightKey) this.angle += this.turnSpeed;
     }
 
