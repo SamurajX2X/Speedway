@@ -1,41 +1,73 @@
+// wszystko co dotyczy gracza
+import { playerConfig, trackConfig, formConfig, playerColors } from './config.js';
+
 export class Player {
-    // wartosci poczatkowe gracza
-    constructor() {
-        this.x = 600;
-        this.y = 200;
+    constructor(playerId) {
+        // podstawowe dane gracza
+        this.playerId = playerId;
+        this.color = playerColors[`player${playerId}`];
+        this.isAlive = true;
+        this.hasWon = false;
+
+        // gdzie startuje gracz
+        const position = playerConfig.startPositions[`player${this.playerId}`];
+        this.x = position.x;
+        this.y = position.y;
+
+        // jak sie porusza
         this.angle = 0;
-        this.speed = 5;
-        this.turnSpeed = 0.05;
+        this.speed = playerConfig.speed;
+        this.turnSpeed = playerConfig.turnSpeed;
+
+        // zostawiany slad
         this.trail = [];
-        this.maxTrailLength = 200;
-        this.trailFadeSteps = 50;
+        this.maxTrailLength = playerConfig.trailMaxLength;
+        this.trailFadeSteps = playerConfig.trailFadeSteps;
+
+        // wyglad skibdii motocykla
         this.isColliding = false;
-        this.radius = 5;  // Match with the arc radius
+        this.radius = playerConfig.radius;
         this.motoImage = new Image();
         this.motoImage.src = 'public/gfx/motorcycle.png';
-        this.imageWidth = 50;
-        this.imageHeight = 30;
+        this.imageWidth = playerConfig.imageWidth;
+        this.imageHeight = playerConfig.imageHeight;
+
+        // okrazenia
+        this.lapsCompleted = 0;
+        this.crossedFinishLine = false;
+        this.finishLineY = trackConfig.finishLine.y;
+        this.finishLineX = trackConfig.finishLine.x;
+        this.controls = formConfig.playerControls[`player${this.playerId}`];
     }
 
-    // rysowanie gracza na ekranie
+    // rysowanie wszystkiego
     draw(ctx) {
-        // rysowanie sladu za graczem
+        // rysowanie sladu
         for (let i = 0; i < this.trail.length - 1; i++) {
             const opacity = (i / this.trail.length);
             ctx.beginPath();
             ctx.moveTo(this.trail[i].x, this.trail[i].y);
             ctx.lineTo(this.trail[i + 1].x, this.trail[i + 1].y);
-            ctx.strokeStyle = `rgba(${this.isColliding ? '255, 165, 0' : '255, 0, 0'}, ${opacity})`;
+
+            // jak sie zderzyl to pomaranczowy slad
+            if (this.isColliding) {
+                ctx.strokeStyle = `rgba(255, 165, 0, ${opacity})`;
+            } else {
+                // normalny kolor sladu
+                const colorBase = this.color.trail.split('(')[1].split(')')[0].split(',');
+                ctx.strokeStyle = `rgba(${colorBase[0]}, ${colorBase[1]}, ${colorBase[2]}, ${opacity})`;
+            }
+
             ctx.lineWidth = 7;
             ctx.stroke();
         }
 
-        // rysowanie motocykla gracza
+        // rysowanie motocykla
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.rotate(this.angle - Math.PI / 2 + Math.PI); // Added + Math.PI to invert the image
+        ctx.rotate(this.angle - Math.PI / 2 + Math.PI);
 
-        // Draw the motorcycle image if loaded
+        // jak obrazek sie zaladowal to go rysujemy
         if (this.motoImage.complete) {
             ctx.drawImage(
                 this.motoImage,
@@ -48,55 +80,102 @@ export class Player {
 
         ctx.restore();
 
-        // rysowanie wskaznika kierunku
+        // mala kreska pokazujaca kierunek
         ctx.beginPath();
         ctx.moveTo(this.x, this.y);
         ctx.lineTo(
             this.x - Math.cos(this.angle) * 10,
             this.y - Math.sin(this.angle) * 10
         );
-        ctx.strokeStyle = this.isColliding ? "orange" : "red";
+        ctx.strokeStyle = this.isColliding ? "orange" : this.color.trail;
         ctx.lineWidth = 5;
         ctx.stroke();
+
+        // tekst z liczba okrazen
+        ctx.save();
+        ctx.fillStyle = this.color.trail;
+        ctx.font = '20px Arial';
+        ctx.fillText(`Gracz ${this.playerId} - Okrazenia: ${this.lapsCompleted}/${this.totalLaps}`, 10, 30 + (this.playerId - 1) * 30);
+        ctx.restore();
     }
 
-    // aktualizacja pozycji gracza
+    // reakcja na klawisze
+    handleInput(leftKey, rightKey) {
+        if (leftKey) this.angle -= this.turnSpeed;
+        if (rightKey) this.angle += this.turnSpeed;
+    }
+
+    // aktualizacja pozycji
     update(keys, board) {
-        // obliczanie nastepnej pozycji
+        if (!this.isAlive) return;
+
+        // nowa pozycja
         const nextX = this.x + Math.cos(this.angle) * this.speed;
         const nextY = this.y + Math.sin(this.angle) * this.speed;
 
-        // sprawdzenie kolizji z torem
+        // sprawdzamy czy mozna jechac dalej
         if (board.isInsideTrack(nextX, nextY)) {
             this.x = nextX;
             this.y = nextY;
 
-            // dodawanie nowego punktu sladu
+            // dodajemy nowy punkt sladu
             this.trail.push({
                 x: this.x,
                 y: this.y,
                 timestamp: Date.now()
             });
 
-            // usuwanie starych punktow sladu
+            // usuwamy najstarsze punkty jak za dlugi slad
             if (this.trail.length > this.maxTrailLength) {
                 this.trail.shift();
             }
 
-            // obrot gracza na podstawie klawiszy
-            if (keys["KeyS"]) this.angle += this.turnSpeed;
-            if (keys["KeyA"]) this.angle -= this.turnSpeed;
+            this.checkFinishLine();
         } else {
+            // jak kolizja to koniec
             this.isColliding = true;
+            this.isAlive = false;
+            console.log(`Gracz ${this.playerId} sie rozwalil`);
         }
     }
 
-    // reset pozycji gracza
+    // sprawdzanie czy minelismy mete
+    checkFinishLine() {
+        const finishLineWidth = trackConfig.finishLine.width;
+        const finishLineHeight = trackConfig.finishLine.height;
+
+        // czy przejezdzamy przez linie mety
+        if (this.y >= this.finishLineY &&
+            this.y <= (this.finishLineY + finishLineHeight) &&
+            Math.abs(this.x - this.finishLineX) < finishLineWidth / 2) {
+
+            if (!this.crossedFinishLine) {
+                this.crossedFinishLine = true;
+                this.lapsCompleted++;
+                console.log(`Okrazenie ${this.lapsCompleted}`);
+            }
+        } else if (this.y > (this.finishLineY + finishLineHeight)) {
+            this.crossedFinishLine = false;
+        }
+
+        // jak wystarczajaco okrazen to wygrana
+        if (this.lapsCompleted >= this.totalLaps) {
+            this.hasWon = true;
+            this.isAlive = false;
+        }
+    }
+
+    // reset do ustawien poczatkowych
     reset() {
-        this.x = 600;
-        this.y = 500;
+        const position = playerConfig.startPositions[`player${this.playerId}`];
+        this.x = position.x;
+        this.y = position.y;
         this.angle = 0;
         this.trail = [];
         this.isColliding = false;
+        this.lapsCompleted = 0;
+        this.crossedFinishLine = false;
+        this.isAlive = true;
+        this.hasWon = false;
     }
 }

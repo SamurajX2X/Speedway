@@ -1,21 +1,19 @@
 body {
     text-align: center;
-    font-family: Arial, sans-serif;
-    background-color: white;
+    font-family: 'Racing Sans One', Arial, sans-serif;
+    background: linear-gradient(45deg, #1a1a1a, #2c2c2c);
     color: white;
     margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    /* overflow: hidden; */
 }
 
 canvas {
-    /* background-color: green; */
-    /* background-image: url('gfx/grass.jpg'); */
-    /* display: none; */
-    border: 5px solid white;
+    border: 5px solid #ff5722;
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(255, 87, 34, 0.3);
 }
 
 #start-screen {
@@ -23,57 +21,157 @@ canvas {
 }
 
 button {
-    font-size: 20px;
-    padding: 10px 20px;
+    font-size: 1.2em;
+    padding: 15px 30px;
     cursor: pointer;
-    background-color: #ff5722;
+    background: #ff5722;
     color: white;
     border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    border-radius: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    margin: 20px 0;
 }
 
 button:hover {
-    background-color: #e64a19;
+    background: #f4511e;
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 87, 34, 0.5);
 }
 
 #gameSettings {
-    background-color: rgba(0, 0, 0, 0.8);
-    padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    color: white;
+    background: rgba(0, 0, 0, 0.9);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.3);
+    border: 2px solid #ff5722;
+    max-width: 500px;
+    width: 90%;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 25px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #ff5722;
+    text-transform: uppercase;
 }
 
 .form-group input,
 .form-group select {
-    padding: 8px;
-    width: 200px;
-    border-radius: 5px;
-    border: 1px solid #444;
+    padding: 12px;
+    width: 80%;
+    border-radius: 8px;
+    border: 2px solid #ff5722;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ff5722;
 }
 
 #controlsInfo {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #444;
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 2px solid rgba(255, 87, 34, 0.3);
+}
+
+#controlsInfo h3 {
+    color: #ff5722;
+    font-size: 1.4em;
+    margin-bottom: 20px;
 }
 
 .player-controls {
     text-align: left;
     max-width: 300px;
     margin: 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 8px;
 }
 
 .player-controls p {
-    margin: 5px 0;
+    margin: 10px 0;
+    font-size: 1.1em;
+}
+
+.player-controls strong {
+    color: #ff5722;
+}
+
+/* Game Over Screen */
+#gameOver {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    border: 3px solid #ff5722;
+    text-align: center;
+    z-index: 1000;
+    min-width: 300px;
+}
+
+#gameOver h2 {
+    color: #ff5722;
+    font-size: 2.5em;
+    margin: 0 0 20px 0;
+    text-transform: uppercase;
+}
+
+#gameOver p {
+    font-size: 1.3em;
+    margin: 20px 0;
+}
+
+#gameOver button {
+    margin-top: 20px;
+}
+
+.winner-text {
+    color: #ff5722;
+    font-weight: bold;
+}
+
+/* Lap Counter Styles */
+.lap-counter {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 2px solid #ff5722;
+    box-shadow: 0 0 15px rgba(255, 87, 34, 0.3);
+    font-size: 1.2em;
+    min-width: 120px;
+}
+
+.lap-counter span {
+    color: #ff5722;
+    font-weight: bold;
+    font-size: 1.4em;
+    display: block;
+    margin-top: 5px;
+}
+
+.lap-counter-label {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #ffffff;
+    font-size: 0.9em;
 }

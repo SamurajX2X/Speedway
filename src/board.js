@@ -1,40 +1,40 @@
+// wszystko co dotyczy toru wyścigowego
 import { Motorcycle } from './motorcycle.js';
+import { trackConfig } from './config.js';
 
 export class Board {
     constructor(width, height) {
+        // podstawowe ustawienia canvasu
         this.canvas = document.getElementById("track") || document.createElement('canvas');
         this.context = this.canvas.getContext("2d");
         this.canvas.width = width;
         this.canvas.height = height;
 
-        // wymiary toru zewnetrznego
-        this.widthBig = 600;
-        this.lengthBig = 1200;
-        this.cornerRadius = 300;
+        // główny tor - zewnętrzny
+        this.widthBig = trackConfig.widthBig;
+        this.lengthBig = trackConfig.lengthBig;
+        this.cornerRadius = trackConfig.cornerRadius;
         this.xStartBig = (width - this.lengthBig) / 2;
         this.yTopBig = (height - this.widthBig) / 2;
 
-        // wymiary toru wewnetrznego
+        // wewnętrzna część toru
         this.widthSmall = this.widthBig - 400;
         this.lengthSmall = this.lengthBig - 400;
         this.cornerRadiusSmall = this.cornerRadius - 150;
         this.xStartSmall = this.xStartBig + (this.lengthBig - this.lengthSmall) / 2;
         this.yTopSmall = this.yTopBig + (this.widthBig - this.widthSmall) / 2;
 
-        // sciezki toru do kolizji
+        // ścieżki do wykrywania kolizji
         this.outerPath = new Path2D();
         this.innerPath = new Path2D();
-        // z racji ze glownie z kolizja mialem problemy taka totalnei basic i matematyczna obrobka kodu (ktora pewnie i dziala szybciej ale no) uzyje Path2D czyli API z canvasa
 
-        // tekstury toru
+        // tekstury podłoża
         this.grassPattern = null;
         this.dirtPattern = null;
         this.loadTextures();
 
-        // parametry playera
+        // ustawienia motocykla
         this.motorcycle = {
-            // x: this.xStartBig + this.lengthBig / 2, // nieuzywane
-            // y: this.yTopBig + this.widthBig / 2,   // nieuzywane
             width: 50,
             height: 30,
             angle: 0,
@@ -44,7 +44,7 @@ export class Board {
         this.loadMotorcycleImage();
     }
 
-    // ladowanie tekstur toru
+    // ładujemy tekstury trawy i ziemi
     loadTextures() {
         const grassImg = new Image();
         const dirtImg = new Image();
@@ -63,7 +63,7 @@ export class Board {
         dirtImg.src = 'public/gfx/dirt.jpg';
     }
 
-    // ladowanie obrazu motocykla
+    // ładujemy obrazek motocykla
     loadMotorcycleImage() {
         const motorcycleImg = new Image();
         motorcycleImg.onload = () => {
@@ -73,28 +73,28 @@ export class Board {
         motorcycleImg.src = 'public/gfx/motorcycle.png';
     }
 
-    // tworzenie sciezek toru
+    // tworzymy kształt toru
     createTrackPaths() {
-        // sciezka zewnetrzna
+        // zewnętrzny obrys
         this.outerPath = new Path2D();
         this.outerPath.roundRect(this.xStartBig, this.yTopBig, this.lengthBig, this.widthBig, this.cornerRadius);
 
-        // sciezka wewnetrzna
+        // wewnętrzny obrys
         this.innerPath = new Path2D();
         this.innerPath.roundRect(this.xStartSmall, this.yTopSmall, this.lengthSmall, this.widthSmall, this.cornerRadiusSmall);
     }
 
-    // rysowanie toru
+    // rysujemy cały sigmaaaa tor
     drawTracks() {
+        // tło  trawa jakas losowa nwm
         this.context.save();
 
-        // rysowanie tekstury trawy
         if (this.grassPattern) {
             this.context.fillStyle = this.grassPattern;
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
 
-        // rysowanie toru zewnetrznego i wewnetrznego
+        // ten dizalajacy tor 
         this.context.beginPath();
         this.context.roundRect(this.xStartBig, this.yTopBig, this.lengthBig, this.widthBig, this.cornerRadius);
         this.context.roundRect(
@@ -105,38 +105,36 @@ export class Board {
             this.cornerRadiusSmall
         );
 
-        // wypelnienie toru tekstura
+        // dirt z majkrafta
         if (this.dirtPattern) {
             this.context.fillStyle = this.dirtPattern;
             this.context.fill('evenodd');
         }
 
-        // rysowanie obrysu toru
+        // obramowanie toru
         this.context.strokeStyle = "black";
         this.context.lineWidth = 5;
         this.context.stroke();
 
         this.context.restore();
 
-        // rysowanie linii startu/mety
+        // linia METY
         this.drawFinishLine();
     }
 
-    // rysowanie linii startu/mety
+    //draw tej mety 
     drawFinishLine() {
-        const stripeSize = 10; // rozmiar pojedynczego kwadratu
+        const stripeSize = 10;
 
-        // szerokosc i wysokosc linii startu/mety
-        const lineWidth = 10; // szerokosc linii
-        const lineHeight = this.lengthBig; // dlugosc linii dopasowana do dlugosci toru
+        const lineWidth = 30;
+        const lineHeight = 192;
 
-        // pozycja linii startu/mety na podstawie pozycji gracza
-        const startX = 600 - lineWidth / 2; // x gracza (dopasowane do pozycji startowej)
-        const startY = this.yTopBig; // poczatek toru zewnetrznego
+        const startX = 600 - lineWidth / 2;
+        const startY = this.yTopBig;
 
         this.context.save();
 
-        // rysowanie szachownicy
+        // szachownica - czarno-białe kwadraty
         for (let y = 0; y < lineHeight; y += stripeSize) {
             for (let x = 0; x < lineWidth; x += stripeSize) {
                 this.context.fillStyle = (x / stripeSize + y / stripeSize) % 2 === 0 ? "black" : "white";
@@ -147,7 +145,7 @@ export class Board {
         this.context.restore();
     }
 
-    // rysowanie motocykla
+    // rysujemy motocykl na torze
     drawMotorcycle() {
         if (this.motorcycle.image) {
             this.context.save();
@@ -164,12 +162,11 @@ export class Board {
         }
     }
 
-    // aktualizacja pozycji motocykla
+    // aktualizacja pozycji motoru
     updateMotorcyclePosition(key) {
         const speedIncrement = 2;
         const angleIncrement = 0.1;
 
-        // zmiana predkosci i kata motocykla
         if (key === "ArrowUp") {
             this.motorcycle.speed += speedIncrement;
         } else if (key === "ArrowDown") {
@@ -180,23 +177,23 @@ export class Board {
             this.motorcycle.angle += angleIncrement;
         }
 
-        // aktualizacja pozycji motocykla
+        // nowa pozycja
         this.motorcycle.x += this.motorcycle.speed * Math.cos(this.motorcycle.angle);
         this.motorcycle.y += this.motorcycle.speed * Math.sin(this.motorcycle.angle);
 
-        // sprawdzenie kolizji z torem
+        // sprawdzamy kolizje
         if (!this.isInsideTrack(this.motorcycle.x, this.motorcycle.y)) {
-            this.motorcycle.speed = 0; // zatrzymanie motocykla w przypadku kolizji
+            this.motorcycle.speed = 0;
         }
     }
 
-    // sprawdzenie czy punkt jest w torze
+    // sprawdzamy czy pozycja jest na torze
     isInsideTrack(x, y) {
         return this.context.isPointInPath(this.outerPath, x, y) &&
             !this.context.isPointInPath(this.innerPath, x, y);
     }
 
-    // inicjalizacja toru
+    // przygotowanie toru do gry
     initialize() {
         if (!document.getElementById("track")) {
             document.body.appendChild(this.canvas);
@@ -205,7 +202,7 @@ export class Board {
         this.drawTracks();
     }
 
-    // aktualizacja toru
+    // odświeżanie widoku
     update() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawTracks();
@@ -213,6 +210,7 @@ export class Board {
     }
 }
 
+// start gry po załadowaniu strony
 document.addEventListener("DOMContentLoaded", () => {
     const board = new Board(1200, 800);
     board.initialize();
