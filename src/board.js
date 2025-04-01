@@ -7,29 +7,34 @@ export class Board {
         this.canvas.width = width;
         this.canvas.height = height;
 
-        // Wymiary głównego toru
+        // wymiary toru zewnetrznego
         this.widthBig = 600;
         this.lengthBig = 1200;
         this.cornerRadius = 300;
         this.xStartBig = (width - this.lengthBig) / 2;
         this.yTopBig = (height - this.widthBig) / 2;
 
-        // Wymiary wewnętrznego toru
+        // wymiary toru wewnetrznego
         this.widthSmall = this.widthBig - 400;
         this.lengthSmall = this.lengthBig - 400;
         this.cornerRadiusSmall = this.cornerRadius - 150;
         this.xStartSmall = this.xStartBig + (this.lengthBig - this.lengthSmall) / 2;
         this.yTopSmall = this.yTopBig + (this.widthBig - this.widthSmall) / 2;
 
-        // Tekstury
-        this.grassPattern = null;
+        // sciezki toru do kolizji
+        this.outerPath = new Path2D();
+        this.innerPath = new Path2D();
+        // z racji ze glownie z kolizja mialem problemy taka totalnei basic i matematyczna obrobka kodu (ktora pewnie i dziala szybciej ale no) uzyje Path2D czyli API z canvasa
 
+        // tekstury toru
+        this.grassPattern = null;
         this.dirtPattern = null;
         this.loadTextures();
 
+        // parametry playera
         this.motorcycle = {
-            x: this.xStartBig + this.lengthBig / 2,
-            y: this.yTopBig + this.widthBig / 2,
+            // x: this.xStartBig + this.lengthBig / 2, // nieuzywane
+            // y: this.yTopBig + this.widthBig / 2,   // nieuzywane
             width: 50,
             height: 30,
             angle: 0,
@@ -39,6 +44,7 @@ export class Board {
         this.loadMotorcycleImage();
     }
 
+    // ladowanie tekstur toru
     loadTextures() {
         const grassImg = new Image();
         const dirtImg = new Image();
@@ -57,6 +63,7 @@ export class Board {
         dirtImg.src = 'public/gfx/dirt.jpg';
     }
 
+    // ladowanie obrazu motocykla
     loadMotorcycleImage() {
         const motorcycleImg = new Image();
         motorcycleImg.onload = () => {
@@ -66,22 +73,28 @@ export class Board {
         motorcycleImg.src = 'public/gfx/motorcycle.png';
     }
 
-    initialize() {
-        if (!document.getElementById("track")) {
-            document.body.appendChild(this.canvas);
-        }
-        this.drawTracks();
-        this.drawMotorcycle();
+    // tworzenie sciezek toru
+    createTrackPaths() {
+        // sciezka zewnetrzna
+        this.outerPath = new Path2D();
+        this.outerPath.roundRect(this.xStartBig, this.yTopBig, this.lengthBig, this.widthBig, this.cornerRadius);
+
+        // sciezka wewnetrzna
+        this.innerPath = new Path2D();
+        this.innerPath.roundRect(this.xStartSmall, this.yTopSmall, this.lengthSmall, this.widthSmall, this.cornerRadiusSmall);
     }
 
+    // rysowanie toru
     drawTracks() {
         this.context.save();
 
+        // rysowanie tekstury trawy
         if (this.grassPattern) {
             this.context.fillStyle = this.grassPattern;
             this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
         }
 
+        // rysowanie toru zewnetrznego i wewnetrznego
         this.context.beginPath();
         this.context.roundRect(this.xStartBig, this.yTopBig, this.lengthBig, this.widthBig, this.cornerRadius);
         this.context.roundRect(
@@ -92,41 +105,49 @@ export class Board {
             this.cornerRadiusSmall
         );
 
+        // wypelnienie toru tekstura
         if (this.dirtPattern) {
             this.context.fillStyle = this.dirtPattern;
             this.context.fill('evenodd');
         }
 
+        // rysowanie obrysu toru
         this.context.strokeStyle = "black";
         this.context.lineWidth = 5;
         this.context.stroke();
 
         this.context.restore();
+
+        // rysowanie linii startu/mety
+        this.drawFinishLine();
     }
 
-    drawTrack(x, y, width, height, radius, color) {
+    // rysowanie linii startu/mety
+    drawFinishLine() {
+        const stripeSize = 10; // rozmiar pojedynczego kwadratu
+
+        // szerokosc i wysokosc linii startu/mety
+        const lineWidth = 10; // szerokosc linii
+        const lineHeight = this.lengthBig; // dlugosc linii dopasowana do dlugosci toru
+
+        // pozycja linii startu/mety na podstawie pozycji gracza
+        const startX = 600 - lineWidth / 2; // x gracza (dopasowane do pozycji startowej)
+        const startY = this.yTopBig; // poczatek toru zewnetrznego
+
         this.context.save();
 
-        if (this.grassPattern) {
-            this.context.fillStyle = this.grassPattern;
-            this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        }
-
-        this.context.beginPath();
-        this.context.roundRect(x, y, width, height, radius);
-
-        this.context.strokeStyle = color;
-        this.context.lineWidth = 5;
-        this.context.stroke();
-
-        if (this.dirtPattern) {
-            this.context.fillStyle = this.dirtPattern;
-            this.context.fill();
+        // rysowanie szachownicy
+        for (let y = 0; y < lineHeight; y += stripeSize) {
+            for (let x = 0; x < lineWidth; x += stripeSize) {
+                this.context.fillStyle = (x / stripeSize + y / stripeSize) % 2 === 0 ? "black" : "white";
+                this.context.fillRect(startX + x, startY + y, stripeSize, stripeSize);
+            }
         }
 
         this.context.restore();
     }
 
+    // rysowanie motocykla
     drawMotorcycle() {
         if (this.motorcycle.image) {
             this.context.save();
@@ -143,10 +164,12 @@ export class Board {
         }
     }
 
+    // aktualizacja pozycji motocykla
     updateMotorcyclePosition(key) {
         const speedIncrement = 2;
         const angleIncrement = 0.1;
 
+        // zmiana predkosci i kata motocykla
         if (key === "ArrowUp") {
             this.motorcycle.speed += speedIncrement;
         } else if (key === "ArrowDown") {
@@ -157,77 +180,36 @@ export class Board {
             this.motorcycle.angle += angleIncrement;
         }
 
+        // aktualizacja pozycji motocykla
         this.motorcycle.x += this.motorcycle.speed * Math.cos(this.motorcycle.angle);
         this.motorcycle.y += this.motorcycle.speed * Math.sin(this.motorcycle.angle);
 
-        // Prevent motorcycle from leaving the track
+        // sprawdzenie kolizji z torem
         if (!this.isInsideTrack(this.motorcycle.x, this.motorcycle.y)) {
-            this.motorcycle.speed = 0; // Stop the motorcycle if it leaves the track
+            this.motorcycle.speed = 0; // zatrzymanie motocykla w przypadku kolizji
         }
     }
 
+    // sprawdzenie czy punkt jest w torze
+    isInsideTrack(x, y) {
+        return this.context.isPointInPath(this.outerPath, x, y) &&
+            !this.context.isPointInPath(this.innerPath, x, y);
+    }
+
+    // inicjalizacja toru
+    initialize() {
+        if (!document.getElementById("track")) {
+            document.body.appendChild(this.canvas);
+        }
+        this.createTrackPaths();
+        this.drawTracks();
+    }
+
+    // aktualizacja toru
     update() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.drawTracks();
         this.drawMotorcycle();
-    }
-
-    isInsideTrack(x, y) {
-        const lineWidth = 5; // Grubość linii toru
-
-        // Definicje centrów narożników dla zewnętrznego toru
-        const centersOuter = {
-            topLeft: { x: this.xStartBig + this.cornerRadius, y: this.yTopBig + this.cornerRadius },
-            topRight: { x: this.xStartBig + this.lengthBig - this.cornerRadius, y: this.yTopBig + this.cornerRadius },
-            bottomLeft: { x: this.xStartBig + this.cornerRadius, y: this.yTopBig + this.widthBig - this.cornerRadius },
-            bottomRight: { x: this.xStartBig + this.lengthBig - this.cornerRadius, y: this.yTopBig + this.widthBig - this.cornerRadius }
-        };
-
-        // Definicje centrów narożników dla wewnętrznego toru
-        const centersInner = {
-            topLeft: { x: this.xStartSmall + this.cornerRadiusSmall, y: this.yTopSmall + this.cornerRadiusSmall },
-            topRight: { x: this.xStartSmall + this.lengthSmall - this.cornerRadiusSmall, y: this.yTopSmall + this.cornerRadiusSmall },
-            bottomLeft: { x: this.xStartSmall + this.cornerRadiusSmall, y: this.yTopSmall + this.widthSmall - this.cornerRadiusSmall },
-            bottomRight: { x: this.xStartSmall + this.lengthSmall - this.cornerRadiusSmall, y: this.yTopSmall + this.widthSmall - this.cornerRadiusSmall }
-        };
-
-        // Sprawdzenie prostych odcinków (środkowa część toru)
-        if (x >= this.xStartBig + this.cornerRadius && x <= this.xStartBig + this.lengthBig - this.cornerRadius &&
-            y >= this.yTopBig && y <= this.yTopBig + this.widthBig) {
-            const isInsideOuter = true;
-            const isInsideInner = x >= this.xStartSmall + this.cornerRadiusSmall &&
-                x <= this.xStartSmall + this.lengthSmall - this.cornerRadiusSmall &&
-                y >= this.yTopSmall && y <= this.yTopSmall + this.widthSmall;
-            if (isInsideOuter && !isInsideInner) {
-                return true;
-            }
-        }
-
-
-
-        // Sprawdzenie czy punkt jest w którymś z narożników zewnętrznego toru
-        const isInOuterCorner =
-            (this.distanceToPoint(x, y, centersOuter.topLeft) <= this.cornerRadius && x <= centersOuter.topLeft.x && y <= centersOuter.topLeft.y) ||
-            (this.distanceToPoint(x, y, centersOuter.topRight) <= this.cornerRadius && x >= centersOuter.topRight.x && y <= centersOuter.topRight.y) ||
-            (this.distanceToPoint(x, y, centersOuter.bottomLeft) <= this.cornerRadius && x <= centersOuter.bottomLeft.x && y >= centersOuter.bottomLeft.y) ||
-            (this.distanceToPoint(x, y, centersOuter.bottomRight) <= this.cornerRadius && x >= centersOuter.bottomRight.x && y >= centersOuter.bottomRight.y);
-
-        // Sprawdzenie czy punkt jest w którymś z narożników wewnętrznego toru
-        const isInInnerCorner =
-            (this.distanceToPoint(x, y, centersInner.topLeft) <= this.cornerRadiusSmall && x <= centersInner.topLeft.x && y <= centersInner.topLeft.y) ||
-            (this.distanceToPoint(x, y, centersInner.topRight) <= this.cornerRadiusSmall && x >= centersInner.topRight.x && y <= centersInner.topRight.y) ||
-            (this.distanceToPoint(x, y, centersInner.bottomLeft) <= this.cornerRadiusSmall && x <= centersInner.bottomLeft.x && y >= centersInner.bottomLeft.y) ||
-            (this.distanceToPoint(x, y, centersInner.bottomRight) <= this.cornerRadiusSmall && x >= centersInner.bottomRight.x && y >= centersInner.bottomRight.y);
-
-        // Punkt jest w torze, jeśli jest w zewnętrznym narożniku i nie jest w wewnętrznym narożniku
-        return isInOuterCorner && !isInInnerCorner;
-    }
-
-    distanceToPoint(x, y, point) {
-        return Math.sqrt(
-            Math.pow(x - point.x, 2) +
-            Math.pow(y - point.y, 2)
-        );
     }
 }
 

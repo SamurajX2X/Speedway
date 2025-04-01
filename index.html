@@ -4,12 +4,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zuzel</title>
+    <title>Żużel</title>
     <link rel="stylesheet" href="public/style.css">
 </head>
 
 <body>
-    <div id="gameArea">
+    <div id="gameSettings">
+        <form id="settingsForm">
+            <div class="form-group">
+                <label for="laps">Liczba okrążeń:</label>
+                <input type="number" id="laps" name="laps" min="1" max="10" value="3">
+            </div>
+
+            <div class="form-group">
+                <label for="players">Liczba graczy:</label>
+                <select id="players" name="players">
+                    <option value="1">1 gracz</option>
+                    <option value="2">2 graczy</option>
+                    <option value="3">3 graczy</option>
+                    <option value="4">4 graczy</option>
+                </select>
+            </div>
+
+            <button type="submit">Rozpocznij wyścig!</button>
+        </form>
+
+        <div id="controlsInfo">
+            <h3>Sterowanie:</h3>
+            <div class="player-controls">
+                <p><strong>Gracz 1:</strong> Strzałka lewo/prawo</p>
+                <p><strong>Gracz 2:</strong> A/S</p>
+                <p><strong>Gracz 3:</strong> G/H</p>
+                <p><strong>Gracz 4:</strong> K/L</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="gameArea" style="display: none;">
         <canvas id="track" width="1200" height="800"></canvas>
     </div>
     <script type="module" src="src/game.js"></script>

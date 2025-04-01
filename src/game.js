@@ -11,8 +11,7 @@ let player;
 let keys = {};
 let gameRunning = false;
 
-function startGame() {
-    // startScreen.style.display = "none";
+function startGame(laps, players) {
     board = new Board(1200, 800);
     board.initialize();
     player = new Player();
@@ -52,7 +51,23 @@ function gameLoop() {
 
 // Obsługa wydarzeń
 document.addEventListener("DOMContentLoaded", () => {
-    startGame();
+    const settingsForm = document.getElementById("settingsForm");
+    const gameArea = document.getElementById("gameArea");
+    const gameSettings = document.getElementById("gameSettings");
+
+    settingsForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const laps = parseInt(document.getElementById("laps").value);
+        const numberOfPlayers = parseInt(document.getElementById("players").value);
+
+        // Hide form and show game
+        gameSettings.style.display = "none";
+        gameArea.style.display = "block";
+
+        // Start game with settings
+        startGame(laps, numberOfPlayers);
+    });
 });
 
 document.addEventListener("keydown", (e) => {

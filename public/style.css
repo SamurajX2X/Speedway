@@ -36,3 +36,44 @@ button {
 button:hover {
     background-color: #e64a19;
 }
+
+#gameSettings {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 8px;
+    width: 200px;
+    border-radius: 5px;
+    border: 1px solid #444;
+}
+
+#controlsInfo {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #444;
+}
+
+.player-controls {
+    text-align: left;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.player-controls p {
+    margin: 5px 0;
+}
