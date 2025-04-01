@@ -25,6 +25,12 @@
                     <option value="4">4 graczy</option>
                 </select>
             </div>
+            <div class="key-binding-container">
+                <button type="button" class="key-binding" data-player="1">Gracz 1: ArrowRight</button>
+                <button type="button" class="key-binding" data-player="2">Gracz 2: KeyD</button>
+                <button type="button" class="key-binding" data-player="3">Gracz 3: KeyL</button>
+                <button type="button" class="key-binding" data-player="4">Gracz 4: KeyN</button>
+            </div>
 
             <button type="submit">Graj</button>
         </form>
@@ -40,7 +46,7 @@
         </div>
     </div> -->
 
-        <div id="key-bindings">
+        <!-- <div id="key-bindings">
             <h3>Sterowanie:</h3>
             <div class="key-binding-container">
                 <button class="key-binding" data-player="1">Player 1: ArrowRight</button>
@@ -48,19 +54,19 @@
                 <button class="key-binding" data-player="3">Player 3: KeyL</button>
                 <button class="key-binding" data-player="4">Player 4: KeyN</button>
             </div>
-        </div>
+        </div> -->
+    </div>
+    <div id="gameArea" style="display: none;">
 
-        <div id="gameArea" style="display: none;">
+        <canvas id="track" width="1200" height="800"></canvas>
+    </div>
 
-            <canvas id="track" width="1200" height="800"></canvas>
-        </div>
-
-        <div id="gameOver" style="display: none;">
-            <h2>Game Over</h2>
-            <p id="winnerText"></p>
-            <button onclick="location.reload()">Play Again</button>
-        </div>
-        <script type="module" src="src/game.js"></script>
+    <div id="gameOver" style="display: none;">
+        <h2>Game Over</h2>
+        <p id="winnerText"></p>
+        <button onclick="location.reload()">Play Again</button>
+    </div>
+    <script type="module" src="src/game.js"></script>
 </body>
 
 </html>

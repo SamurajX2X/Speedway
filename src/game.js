@@ -60,12 +60,7 @@ function startGame(laps, numberOfPlayers) {
     currentLaps = laps
     currentPlayers = numberOfPlayers
 
-    // Create new board and add canvas to gameArea
     board = new Board(1200, 800)
-    const gameArea = document.getElementById("gameArea")
-    gameArea.innerHTML = '' // Clear previous content
-    gameArea.appendChild(board.canvas) // Add canvas to gameArea
-
     board.initialize()
 
     // czyszczenie starych graczy
@@ -79,7 +74,7 @@ function startGame(laps, numberOfPlayers) {
     }
 
     gameRunning = true
-    console.log(`Start gry: ${currentLaps} laps, ${currentPlayers} players`)
+    console.log(`Start gry${currentLaps} laps  ${currentPlayers} players`)
     requestAnimationFrame(gameLoop)
 }
 
